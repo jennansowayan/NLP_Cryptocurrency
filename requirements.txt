@@ -13,7 +13,6 @@ tomotopy
 praw
 wordcloud
 wordninja
-seaborn
 re
 string
 collections
