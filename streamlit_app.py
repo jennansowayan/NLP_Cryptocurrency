@@ -3,8 +3,6 @@
 # %%
 from IPython import get_ipython
 
-
-
 # %%
 import string
 
@@ -17,6 +15,8 @@ import praw
 import streamlit as st
 
 
+get_ipython().run_line_magic('matplotlib', 'inline')
+
 
 # %%
 
@@ -27,8 +27,8 @@ reddit = praw.Reddit(client_id='qQBQxY9R1zGrYJH9pACBOw', client_secret='MjrjCout
 st.title('Crypto Trader Assistant')
 st.text('This tool gives traders and investors a sentiment about the cryptocurrency from r/Cryptocurrency.')
 
-ucurr = st.text_input('Cryptocurrency', 'BTC')
-st.write('Cryptocurrency', ucurr)
+ucurr = st.text_input('Enter a word related to the Cryptocurrency world:', 'e.g. btc')
+st.balloons()
 
 
 # %%
@@ -48,15 +48,9 @@ crypto['original_body'] = crypto['body']
 
 
 # %%
-crypto
-
-
-# %%
 import spacy
 nlp = spacy.blank('en')
 
-
-import re
 
 def remove_urls(text):
     url_pattern = re.compile(r'https?://\S+|www\.\S+')
@@ -66,8 +60,8 @@ def remove_punctuation(text):
     return text.translate(str.maketrans('', '', string.punctuation))
 
 def remove_stop_words(text):
-    nlp.Defaults.stop_words |= {'nt','crypto', 'cryptocurrency', ' nt', 'nt '}
     doc = nlp(text)
+    nlp.Defaults.stop_words |= {'nt','crypto', 'cryptocurrency', ' nt', 'nt '}
     return " ".join([token.text for token in doc if not token.is_stop])
 
 def lemmatize_words(text):
@@ -119,8 +113,8 @@ def lower_case_text(text):
 
 funcs = [
     remove_urls, 
-    remove_punctuation,
     lower_case_text,
+    remove_punctuation,
     remove_stop_words, 
     remove_emoji, 
     remove_double_quotes, 
@@ -153,20 +147,6 @@ def generate_ngrams(text, n_gram=2):
 
 
 # %%
-from wordcloud import WordCloud
-
-fig_wordcloud = WordCloud(stopwords=nlp.stopwords, background_color='lightgrey', 
-                          colormap='viridis', width=800, height=600
-                         ).generate(' '.join(body_list))
-
-plt.figure(figsize=(10, 7), frameon=True)
-plt.imshow(fig_wordcloud)
-plt.axis('off')
-plt.show()
-
-st.pyplot(fig_wordcloud)
-
-# %%
 from sklearn.feature_extraction.text import TfidfVectorizer
 from scipy import linalg
 from sklearn import decomposition
@@ -193,53 +173,14 @@ docs = [generate_ngrams(body) for body in body_list]
 
 
 # %%
-docs
-
-
-# %%
 from gensim.corpora import Dictionary
 
 dic = Dictionary(docs)
 
 
 # %%
-id = 0
-
-for i in dic:
-    if dic[i] == r'^crypto|$crypto':
-        id = i
-
-
-# %%
-id
-
-
-# %%
-dic[1]
-
-
-# %%
-dic.dfs
-
-
-# %%
 corpus = [dic.doc2bow(doc) for doc in docs]
 
-
-# %%
-corpus
-
-# %% [markdown]
-# ## Training 
-# 
-# Now it's time to train our topic model. We do this with the following parameters:
-# 
-# - **corpus**: the bag-of-word representations of our documents
-# - **id2token**: the mapping from indices to words
-# - **num_topics**: the number of topics we want the model to identify
-# - **chunksize**: the number of documents the model sees for every update
-# - **passes**: the number of times we show the total corpus to the model during training
-# - **random_state**: we use a seed to ensure reproducibility.
 
 # %%
 from gensim.models import LdaModel
@@ -248,64 +189,35 @@ model = LdaModel(corpus=corpus, id2word=dic, num_topics=number_of_topics, chunks
 
 
 # %%
-model.get_term_topics(130, minimum_probability=None)
+x = model.show_topics(num_topics=30, num_words=20,formatted=False)
+topics_words = [(tp[0], [wd[0] for wd in tp[1]]) for tp in x]
+
+tid = np.nan
+flag = 0
+for topic,words in topics_words:
+    print(str(topic)+ ":"+ str(words))
+    for word in words:
+        if len(re.findall('('+'btc'+')', word)):
+            tid = topic
+            flag = 1
+            break
+    if flag:
+        break
+        
+      
 
 
 # %%
-# x=model.show_topics(num_topics=12, num_words=5,formatted=False)
-# topics_words = [(tp[0], [wd[0] for wd in tp[1]]) for tp in x]
-
-# tid = null
-
-# for topic,words in topics_words:
-#     print(str(topic)+ ":"+ str(words))
-#     for word in words
-#         if word == 'btc'
-#             tid = topic
-#             break
-
-# prin
-
-
-# %%
-x=model.show_topics()
-
-twords={}
-for topic,word in x:
-    twords[topic]= re.split('[^A-Za-z ]+', '', word)
-print(twords)
-
-
-# %%
-for (topic, words) in model.print_topics():
-    print(topic+1, ":", words, '\n\n')
-
-
-# %%
-original_body_list = crypto.original_body.tolist()
-
-
-# %%
-for (text, doc) in zip(original_body_list[:9], docs[:9]):
-    print('\033[1m' + 'Text: ' + '\033[0m', text)
-    print('\033[1m' + 'Topics: ' + '\033[0m', [(topic+1, prob) for (topic, prob) in model[dic.doc2bow(doc)] if prob > 0.15])
-    print('\n')
-
-# %% [markdown]
-# Now let's see what topic is going to assign to the post-**2179**, previously tested with the svd decomposition for the unigram term-document matrix.
-
-# %%
-print('\033[1m' + 'Text: ' + '\033[0m', original_body_list[20])
-print('\033[1m' + 'Topic: ' + '\033[0m', [(topic+1, prob) for (topic, prob) in model[dic.doc2bow(docs[20])] if prob > 0.1])
-
-# %% [markdown]
-# the topics assigned by the LDA are not 100% spot-on, **topic 5** seems to be appropriate but **topic 9** seems to be out of place.
-# 
-# Let's see what kind of topic the LDA is going to choose for the post **280** tested with the bigram matrix decomposition.
-
-# %%
-print('\033[1m' + 'Text: ' + '\033[0m', original_body_list[30])
-print('\033[1m' + 'Topic: ' + '\033[0m',[(topic+1, prob) for (topic, prob) in model[dic.doc2bow(docs[30])] if prob > 0.1])
+if np.isnan(tid):
+     st.error('Topic not found, please revise the spelling or enter another topic.')
+else:
+     ilist = []
+     for doc in range(len(docs)):
+          prob = model.get_document_topics(dic.doc2bow(docs[doc]),minimum_probability=0)
+          if prob[tid][1] > 0.15:
+               ilist.append(doc)
+               
+print(ilist)
 
 
 # %%
@@ -319,8 +231,8 @@ def getPolarity(twt):
     return TextBlob(twt).sentiment.polarity
 
 # create two new columns called "Subjectivity" & "Polarity"
-crypto['subjectivity'] = crypto['original_body'].apply(getSubjectivity)
-crypto['polarity'] = crypto['original_body'].apply(getPolarity)
+crypto['subjectivity'] = crypto['original_body'][ilist].apply(getSubjectivity)
+crypto['polarity'] = crypto['original_body'][ilist].apply(getPolarity)
 
 
 # %%
@@ -337,6 +249,50 @@ def getSentiment(score):
 # %%
 # create a column to store the text sentiment
 crypto['sentiment'] = crypto['polarity'].apply(getSentiment)
+
+
+# %%
+def getpercentage(df):
+    p = df.sentiment.loc[ df.sentiment == 'positive'].count()
+    neg = df.sentiment.loc[ df.sentiment == 'negative'].count()
+    n = df.sentiment.loc[ df.sentiment == 'neutral'].count()
+    total = p + neg + n
+    p1, p2, p3 = p/total, n/total, neg/total
+    return [p1*100, p2*100, p3*100] 
+
+
+# %%
+df=crypto.loc[ilist]
+values =getpercentage(df)
+labels = ['Positive', 'Neutral', 'Negative']
+
+
+# %%
+values
+
+
+# %%
+colors = ['blue','grey','red']
+
+
+# %%
+import plotly.graph_objects as go
+import plotly.express as px
+fig6 = go.Figure(data = go.Pie(values = values, 
+                               labels = labels, hole = 0.8,
+                               marker_colors = colors ))
+fig6.update_traces(hoverinfo='label+percent',
+                   textinfo='percent', textfont_size=20)
+fig6.add_annotation(x= 0.5, y = 0.5,
+                    text = 'Sentiments',
+                    font = dict(size=20,family='Verdana', 
+                                color='black'),
+                    showarrow = False)
+fig6.show()
+
+
+# %%
+st.pyplot(fig6)
 
 
 # %%
