@@ -46,6 +46,7 @@ crypto['original_body'] = crypto['body']
 
 
 # %%
+import re
 import spacy
 nlp = spacy.blank('en')
 
