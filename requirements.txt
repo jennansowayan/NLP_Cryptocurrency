@@ -12,8 +12,6 @@ plotnine
 tomotopy
 praw
 wordcloud
-string
-collections
 sklearn
 scipy
 fbpca
