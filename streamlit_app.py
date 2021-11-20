@@ -15,8 +15,6 @@ import praw
 import streamlit as st
 
 
-get_ipython().run_line_magic('matplotlib', 'inline')
-
 
 # %%
 
