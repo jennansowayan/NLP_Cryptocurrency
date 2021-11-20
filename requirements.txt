@@ -12,7 +12,7 @@ plotnine
 tomotopy
 praw
 wordcloud
-re
+re == 2.2.1
 string
 collections
 sklearn
