@@ -14,6 +14,9 @@ import spacy
 import praw
 import streamlit as st
 
+import warnings
+warnings.filterwarnings('ignore')
+
 
 
 # %%
@@ -294,10 +297,10 @@ fig6.show()
 st.plotly_chart(fig6)
 
 
-# %%
-if __name__ == '__main__':
-    main()
-    import warnings
-    warnings.filterwarnings('ignore')
+# # %%
+# if __name__ == '__main__':
+#     main()
+#     import warnings
+#     warnings.filterwarnings('ignore')
 
 
