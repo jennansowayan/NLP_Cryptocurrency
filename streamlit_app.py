@@ -291,7 +291,7 @@ fig6.show()
 
 
 # %%
-st.pyplot(fig6)
+st.plotly_chart(fig6)
 
 
 # %%
