@@ -66,7 +66,7 @@ def remove_punctuation(text):
     return text.translate(str.maketrans('', '', string.punctuation))
 
 def remove_stop_words(text):
-    nlp.Defaults.stop_words |= {“nt”,“crypto”, “cryptocurrency”, ” nt”, “nt “}
+    nlp.Defaults.stop_words |= {'nt','crypto', 'cryptocurrency', ' nt', 'nt '}
     doc = nlp(text)
     return " ".join([token.text for token in doc if not token.is_stop])
 
