@@ -6,7 +6,7 @@ numpy
 opencv-python-headless
 streamlit_drawable_canvas
 layout
-spacy
+spacy == 2.2.4
 gensim
 plotnine
 tomotopy
@@ -16,5 +16,4 @@ sklearn
 scipy
 fbpca
 textblob
-Seaborn
-re
+seaborn
