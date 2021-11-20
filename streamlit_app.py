@@ -3,8 +3,6 @@
 # %%
 from IPython import get_ipython
 
-# %%
-get_ipython().system('pip3 install spacy >= 2.2.4')
 
 
 # %%
@@ -18,8 +16,6 @@ import spacy
 import praw
 import streamlit as st
 
-
-get_ipython().run_line_magic('matplotlib', 'inline')
 
 
 # %%
@@ -70,8 +66,8 @@ def remove_punctuation(text):
     return text.translate(str.maketrans('', '', string.punctuation))
 
 def remove_stop_words(text):
+    nlp.Defaults.stop_words |= {“nt”,“crypto”, “cryptocurrency”, ” nt”, “nt “}
     doc = nlp(text)
-    nlp.Defaults.stop_words -= {"nt","crypto", "cryptocurrency"}
     return " ".join([token.text for token in doc if not token.is_stop])
 
 def lemmatize_words(text):
@@ -124,13 +120,13 @@ def lower_case_text(text):
 funcs = [
     remove_urls, 
     remove_punctuation,
+    lower_case_text,
     remove_stop_words, 
     remove_emoji, 
     remove_double_quotes, 
     remove_single_quotes,
-    lower_case_text,
     remove_other_chars,
-    # lemmatize_words,
+    lemmatize_words,
     remove_spaces,
     trim]
 
@@ -157,8 +153,18 @@ def generate_ngrams(text, n_gram=2):
 
 
 # %%
-get_ipython().system('pip3 install fbpca')
+from wordcloud import WordCloud
 
+fig_wordcloud = WordCloud(stopwords=nlp.stopwords, background_color='lightgrey', 
+                          colormap='viridis', width=800, height=600
+                         ).generate(' '.join(body_list))
+
+plt.figure(figsize=(10, 7), frameon=True)
+plt.imshow(fig_wordcloud)
+plt.axis('off')
+plt.show()
+
+st.pyplot(fig_wordcloud)
 
 # %%
 from sklearn.feature_extraction.text import TfidfVectorizer
