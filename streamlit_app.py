@@ -26,7 +26,7 @@ reddit = praw.Reddit(client_id='qQBQxY9R1zGrYJH9pACBOw', client_secret='MjrjCout
 
 # %%
 st.title('Crypto Trader Assistant')
-st.subheader('This tool gives traders and investors a sentiment about the cryptocurrency from /n the subreddit r/Cryptocurrency.')
+st.subheader('This tool gives traders and investors a sentiment about the cryptocurrency from the subreddit r/Cryptocurrency.')
 
 ucurr = st.text_input('Enter a word related to the Cryptocurrency world:', 'e.g. btc')
 st.balloons()
