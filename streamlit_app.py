@@ -240,9 +240,9 @@ crypto['polarity'] = crypto['original_body'][ilist].apply(getPolarity)
 # %%
 # create a function get the sentiment text
 def getSentiment(score):
-    if score < -0.1:
+    if score < -0.05:
         return "negative"
-    elif score > 0.1:
+    elif score > 0.05:
         return "positive"
     else:
         return "neutral"
