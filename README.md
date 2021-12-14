@@ -1,3 +1,3 @@
 # crypto_nlp
 
-this is the project
+https://share.streamlit.io/jennansowayan/nlp_cryptocurrency/main
