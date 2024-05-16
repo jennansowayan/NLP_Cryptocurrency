@@ -298,9 +298,9 @@ st.plotly_chart(fig6)
 
 
 # # %%
-# if __name__ == '__main__':
-#     main()
-#     import warnings
-#     warnings.filterwarnings('ignore')
+ if __name__ == '__main__':
+    main()
+     import warnings
+    warnings.filterwarnings('ignore')
 
 
